@@ -16,9 +16,19 @@
   "homepage": "https://github.com/Haroenv/holmes",
   "ignore": [
     "**/.*",
-    "node_modules",
+    "__tests__",
     "bower_components",
-    "test",
-    "tests"
+    "coverage/",
+    "css/",
+    "deploy.sh",
+    "doc/",
+    "images/",
+    "index.html",
+    "install.json",
+    "js/main.js",
+    "js/microlight.js",
+    "js/types.js",
+    "js/util.js",
+    "node_modules"
   ]
 }

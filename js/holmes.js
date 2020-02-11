@@ -1,158 +1,354 @@
-/**
- * search for dom elements on your page
- * @module holmes
- */
-(function(root, factory) {
+(function(a, b) {
+  'object' == typeof exports && 'undefined' != typeof module
+    ? (module.exports = b())
+    : 'function' == typeof define && define.amd ? define(b) : (a.holmes = b());
+})(this, function() {
   'use strict';
-
-  if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module.
-    define([], function() {
-      return (root.holmes = factory(document));
-    });
-  } else if (typeof exports === 'object') {
-    // Node. Does not work with strict CommonJS, but
-    // only CommonJS-like environments that support module.exports,
-    // like Node.
-    module.exports = factory(document);
-  } else {
-    // Browser globals
-    root.holmes = factory(document);
-  }
-})(this, function(document) {
-  // UMD Definition above, do not remove this line
-
-  // To get to know more about the Universal Module Definition
-  // visit: https://github.com/umdjs/umd
-
-  'use strict';
-
-  /**
-   * search for dom elements on your page
-   * @alias module:holmes
-   * @param {string} [options.input='input[type=search]']
-   *   A <code>querySelector</code> to find the <code>input</code>
-   * @param {string} options.find
-   *   A <code>querySelectorAll</code> rule to find each of the find terms
-   * @param {string=} options.placeholder
-   *   Text to show when there are no results (<code>innerHTML</code>)
-   * @param {string} [options.class.visible=false]
-   *   class to add to matched items
-   * @param {string} [options.class.hidden='hidden']
-   *   class to add to non-matched items
-   * @param {boolean} [options.dynamic=false]
-   *   Whether to query for the content of the elements on every input.
-   *   If this is <code>false</code>, then only when initializing the script will
-   *   fetch the content of the elements to search in. If this is <code>true</code>
-   *   then it will refresh on every <code>input</code> event.
-   * @param {boolean} [options.contenteditable=false]
-   *   whether the input is a contenteditable or not. By default it's
-   *   assumed that it's <code>&lt;input&gt;</code>, <code>true</code> here will use <code>&lt;div contenteditable&gt;</code>
-   */
-  function holmes(options) {
-    window.addEventListener('DOMContentLoaded', function() {
-      // setting default values
-      if (typeof options.input == 'undefined') {
-        options.input = 'input[type=search]'
-      }
-      if (typeof options.placeholder == 'undefined') {
-        options.placeholder = false;
-      }
-      if (typeof options.class == 'undefined') {
-        options.class = {};
-      }
-      if (typeof options.class.visible == 'undefined') {
-        options.class.visible = false;
-      }
-      if (typeof options.class.hidden == 'undefined') {
-        options.class.hidden = 'hidden';
-      }
-      if (typeof options.dynamic == 'undefined') {
-        options.dynamic = false;
-      }
-      if (typeof options.contenteditable == 'undefined') {
-        options.contenteditable = false;
-      }
-
-      // find the search and the elements
-      // in case you would support dynamic content, the elements qs needs to be moved
-      var search = document.querySelector(options.input);
-      var elements = document.querySelectorAll(options.find);
-      var elementsLength = elements.length;
-
-      // create a container for a placeholder
-      if (options.placeholder) {
-        var placeholder = document.createElement('div');
-        placeholder.classList.add(options.class.hidden);
-        placeholder.innerHTML = options.placeholder;
-        elements[0].parentNode.appendChild(placeholder);
-      }
-
-      // if a visible class is given, give it to everything
-      if (options.class.visible) {
-        var i;
-        for (i = 0; i < elementsLength; i++) {
-          elements[i].classList.add(options.class.visible);
-        }
-      }
-
-      // listen for input
-      search.addEventListener('input', function() {
-
-        // by default the value isn't found
-        var found = false;
-
-        // search in lowercase
-        var searchString;
-        if (options.contenteditable) {
-          searchString = search.textContent.toLowerCase();
-        } else {
-          searchString = search.value.toLowerCase();
-        }
-
-        // if the dynamic option is enabled, then we should query
-        // for the contents of `elements` on every input
-        if (options.dynamic) {
-          elements = document.querySelectorAll(options.find);
-          elementsLength = elements.length;
-        }
-
-        // loop over all the elements
-        // in case this should become dynamic, query for the elements here
-        var i;
-        for (i = 0; i < elementsLength; i++) {
-
-          // if the current element doesn't containt the search string
-          // add the hidden class and remove the visbible class
-          if (elements[i].textContent.toLowerCase().indexOf(searchString) === -1) {
-            elements[i].classList.add(options.class.hidden);
-            if (options.class.visible) {
-              elements[i].classList.remove(options.class.visible);
-            }
-          // else
-          // remove the hidden class and add the visible
-          } else {
-            elements[i].classList.remove(options.class.hidden);
-            if (options.class.visible) {
-              elements[i].classList.add(options.class.visible);
-            }
-            // the element is now found at least once
-            found = true;
+  var f = 'undefined' == typeof window ? global : window,
+    g = function(c, a) {
+      return -1 !== c.indexOf(a);
+    },
+    h =
+      'function' == typeof Symbol && 'symbol' == typeof Symbol.iterator
+        ? function(a) {
+            return typeof a;
           }
-        };
-        // if the element wasn't found
-        // and a placeholder is given,
-        // stop hiding it now
-        if (!found && options.placeholder) {
-          placeholder.classList.remove(options.class.hidden);
-        // otherwise hide it again
-        } else {
-          placeholder.classList.add(options.class.hidden);
+        : function(a) {
+            return a &&
+            'function' == typeof Symbol &&
+            a.constructor === Symbol &&
+            a !== Symbol.prototype
+              ? 'symbol'
+              : typeof a;
+          },
+    a = (function() {
+      function a(a) {
+        this.value = a;
+      }
+      function b(b) {
+        function c(e, f) {
+          try {
+            var g = b[e](f),
+              h = g.value;
+            h instanceof a
+              ? Promise.resolve(h.value).then(
+                  function(a) {
+                    c('next', a);
+                  },
+                  function(a) {
+                    c('throw', a);
+                  }
+                )
+              : d(g.done ? 'return' : 'normal', g.value);
+          } catch (a) {
+            d('throw', a);
+          }
         }
-      });
-    });
-  };
-
-  return holmes;
-
+        function d(a, b) {
+          'return' === a
+            ? e.resolve({ value: b, done: !0 })
+            : 'throw' === a ? e.reject(b) : e.resolve({ value: b, done: !1 });
+          (e = e.next), e ? c(e.key, e.arg) : (f = null);
+        }
+        var e, f;
+        (this._invoke = function(a, b) {
+          return new Promise(function(d, g) {
+            var h = { key: a, arg: b, resolve: d, reject: g, next: null };
+            f ? (f = f.next = h) : ((e = f = h), c(a, b));
+          });
+        }),
+          'function' != typeof b.return && (this.return = void 0);
+      }
+      return (
+        'function' == typeof Symbol &&
+          Symbol.asyncIterator &&
+          (b.prototype[Symbol.asyncIterator] = function() {
+            return this;
+          }),
+        (b.prototype.next = function(a) {
+          return this._invoke('next', a);
+        }),
+        (b.prototype.throw = function(a) {
+          return this._invoke('throw', a);
+        }),
+        (b.prototype.return = function(a) {
+          return this._invoke('return', a);
+        }),
+        {
+          wrap: function(a) {
+            return function() {
+              return new b(a.apply(this, arguments));
+            };
+          },
+          await: function(b) {
+            return new a(b);
+          },
+        }
+      );
+    })(),
+    i = function(a, b) {
+      if (!(a instanceof b))
+        throw new TypeError('Cannot call a class as a function');
+    },
+    b = (function() {
+      function a(a, b) {
+        for (var c, d = 0; d < b.length; d++)
+          (c = b[d]),
+            (c.enumerable = c.enumerable || !1),
+            (c.configurable = !0),
+            'value' in c && (c.writable = !0),
+            Object.defineProperty(a, c.key, c);
+      }
+      return function(b, c, d) {
+        return c && a(b.prototype, c), d && a(b, d), b;
+      };
+    })();
+  var j = {
+      invalidInput: 'The Holmes input was no <input> or contenteditable.',
+      optionsObject:
+        'The options need to be given inside an object like this:\n\nnew Holmes({\n  find:".result"\n});\n\nsee also https://haroen.me/holmes/doc/holmes.html',
+      findOption:
+        'A find argument is needed. That should be a querySelectorAll for each of the items you want to match individually. You should have something like:\n\nnew Holmes({\n  find:".result"\n});\n\nsee also https://haroen.me/holmes/doc/holmes.html',
+      noInput: "Your Holmes.input didn't match a querySelector",
+      impossiblePlaceholder:
+        "The Holmes placeholder couldn't be put; the elements had no parent.",
+    },
+    c = (function() {
+      function f(a) {
+        var k = this;
+        i(this, f);
+        var c = !1;
+        if ('object' !== ('undefined' == typeof a ? 'undefined' : h(a)))
+          throw new Error(j.optionsObject);
+        if ('string' != typeof a.find) throw new Error(j.findOption);
+        var d = {
+          input: 'input[type=search]',
+          find: '',
+          placeholder: void 0,
+          mark: !1,
+          class: { visible: void 0, hidden: 'hidden' },
+          dynamic: !1,
+          minCharacters: 0,
+          hiddenAttr: !1,
+          shouldShow: g,
+          onHidden: void 0,
+          onVisible: void 0,
+          onEmpty: void 0,
+          onFound: void 0,
+          onInput: void 0,
+        };
+        (this.options = Object.assign({}, d, a)),
+          (this.options.class = Object.assign({}, d.class, a.class)),
+          (this.hidden = 0),
+          (this.running = !1),
+          window.addEventListener('DOMContentLoaded', function() {
+            return k.start();
+          }),
+          (this.search = function() {
+            k.running = !0;
+            var d = !1;
+            (k.searchString = k.inputString()),
+              (k.options.minCharacters &&
+                0 !== k.searchString.length &&
+                k.options.minCharacters > k.searchString.length) ||
+                (k.options.dynamic &&
+                  ((k.elements = document.querySelectorAll(k.options.find)),
+                  (k.elementsLength = k.elements.length),
+                  (k.elementsArray = Array.prototype.slice.call(k.elements))),
+                k.options.mark &&
+                  (k._regex = new RegExp(
+                    '(' + k.searchString + ')(?![^<]*>)',
+                    'gi'
+                  )),
+                k.elementsArray.forEach(function(a) {
+                  k.options.shouldShow(
+                    a.textContent.toLowerCase(),
+                    k.searchString
+                  )
+                    ? (k._showElement(a),
+                      c &&
+                        'function' == typeof k.options.onFound &&
+                        k.options.onFound(k.placeholderNode),
+                      (d = !0))
+                    : k._hideElement(a);
+                }),
+                'function' == typeof k.options.onInput &&
+                  k.options.onInput(k.searchString),
+                d
+                  ? k.options.placeholder && k._hideElement(k.placeholderNode)
+                  : (k.options.placeholder && k._showElement(k.placeholderNode),
+                    !1 == c &&
+                      ((c = !0),
+                      'function' == typeof k.options.onEmpty &&
+                        k.options.onEmpty(k.placeholderNode))));
+          });
+      }
+      return (
+        b(f, [
+          {
+            key: '_hideElement',
+            value: function(b) {
+              this.options.class.visible &&
+                b.classList.remove(this.options.class.visible),
+                b.classList.contains(this.options.class.hidden) ||
+                  (b.classList.add(this.options.class.hidden),
+                  this.hidden++,
+                  'function' == typeof this.options.onHidden &&
+                    this.options.onHidden(b)),
+                this.options.hiddenAttr && b.setAttribute('hidden', 'true'),
+                this.options.mark &&
+                  (b.innerHTML = b.innerHTML.replace(/<\/?mark>/g, ''));
+            },
+          },
+          {
+            key: '_showElement',
+            value: function(b) {
+              this.options.class.visible &&
+                b.classList.add(this.options.class.visible),
+                b.classList.contains(this.options.class.hidden) &&
+                  (b.classList.remove(this.options.class.hidden),
+                  this.hidden--,
+                  'function' == typeof this.options.onVisible &&
+                    this.options.onVisible(b)),
+                this.options.hiddenAttr && b.removeAttribute('hidden'),
+                this.options.mark &&
+                  ((b.innerHTML = b.innerHTML.replace(/<\/?mark>/g, '')),
+                  this.searchString.length &&
+                    (b.innerHTML = b.innerHTML.replace(
+                      this._regex,
+                      '<mark>$1</mark>'
+                    )));
+            },
+          },
+          {
+            key: '_inputHandler',
+            value: function() {
+              console.warn(
+                'You can now directly call .search() to refresh the results'
+              ),
+                this.search();
+            },
+          },
+          {
+            key: 'inputString',
+            value: function() {
+              if (this.input instanceof HTMLInputElement)
+                return this.input.value.toLowerCase();
+              if (this.input.isContentEditable)
+                return this.input.textContent.toLowerCase();
+              throw new Error(j.invalidInput);
+            },
+          },
+          {
+            key: 'setInput',
+            value: function(b) {
+              if (this.input instanceof HTMLInputElement) this.input.value = b;
+              else if (this.input.isContentEditable) this.input.textContent = b;
+              else throw new Error(j.invalidInput);
+            },
+          },
+          {
+            key: 'start',
+            value: function() {
+              var d = document.querySelector(this.options.input);
+              if (d instanceof HTMLElement) this.input = d;
+              else throw new Error(j.noInput);
+              if ('string' == typeof this.options.find)
+                this.elements = document.querySelectorAll(this.options.find);
+              else throw new Error(j.findOption);
+              if (
+                ((this.elementsLength = this.elements.length),
+                (this.elementsArray = Array.prototype.slice.call(
+                  this.elements
+                )),
+                (this.hidden = 0),
+                'string' == typeof this.options.placeholder)
+              ) {
+                var a = this.options.placeholder;
+                if (
+                  ((this.placeholderNode = document.createElement('div')),
+                  (this.placeholderNode.id = 'holmes-placeholder'),
+                  this._hideElement(this.placeholderNode),
+                  (this.placeholderNode.innerHTML = a),
+                  this.elements[0].parentNode instanceof Element)
+                )
+                  this.elements[0].parentNode.appendChild(this.placeholderNode);
+                else throw new Error(j.impossiblePlaceholder);
+              }
+              if (this.options.class.visible) {
+                var b = this.options.class.visible;
+                this.elementsArray.forEach(function(c) {
+                  c.classList.add(b);
+                });
+              }
+              this.input.addEventListener('input', this.search);
+            },
+          },
+          {
+            key: 'stop',
+            value: function() {
+              var d = this;
+              return new Promise(function(a, b) {
+                try {
+                  d.input.removeEventListener('input', d.search),
+                    d.options.placeholder &&
+                      (d.placeholderNode.parentNode
+                        ? d.placeholderNode.parentNode.removeChild(
+                            d.placeholderNode
+                          )
+                        : b(new Error(j.impossiblePlaceholder))),
+                    d.options.mark &&
+                      d.elementsArray.forEach(function(b) {
+                        b.innerHTML = b.innerHTML.replace(/<\/?mark>/g, '');
+                      }),
+                    (d.running = !1),
+                    a('This instance of Holmes has been stopped.');
+                } catch (c) {
+                  b(c);
+                }
+              });
+            },
+          },
+          {
+            key: 'clear',
+            value: function() {
+              var c = this;
+              this.setInput(''),
+                this.elementsArray.forEach(function(a) {
+                  c._showElement(a);
+                }),
+                this.options.placeholder &&
+                  this._hideElement(this.placeholderNode),
+                (this.hidden = 0);
+            },
+          },
+          {
+            key: 'count',
+            value: function() {
+              return {
+                all: this.elementsLength,
+                hidden: this.hidden,
+                visible: this.elementsLength - this.hidden,
+              };
+            },
+          },
+        ]),
+        f
+      );
+    })(),
+    d = (function(g) {
+      var a = function() {
+        for (var a, b = arguments.length, c = Array(b), d = 0; d < b; d++)
+          c[d] = arguments[d];
+        return (
+          (a =
+            'undefined' != typeof this && this !== f
+              ? g.call.apply(g, [this].concat(c))
+              : new (Function.prototype.bind.apply(g, [null].concat(c)))()),
+          a
+        );
+      };
+      return (a.__proto__ = g), (a.prototype = g.prototype), a;
+    })(c);
+  return d;
 });

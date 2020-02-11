@@ -9,7 +9,7 @@
 
 /* string content */
 .str {
-  color: #006400;
+  color: hsl(104, 100%, 24%);
   font-weight: normal;
   font-style: normal;
 }
@@ -109,3 +109,27 @@ ol.linenums {
   margin-top: 0;
   margin-bottom: 0;
 }
+
+code {
+  font-family: $monospace;
+  padding: 0 .5em;
+  background: $theme-code;
+  color: $theme-code-color;
+  border-radius: 2px;
+}
+
+pre {
+  padding: 1rem;
+  overflow: auto;
+
+  code {
+    padding: 0;
+    margin: 0;
+    display: block;
+    background: none;
+    color: currentColor;
+    border-radius: 0;
+  }
+}
+
+@import "prettify";
